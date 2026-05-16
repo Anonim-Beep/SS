@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Happy Mensive Sean & Sheila</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    body { background: #f0f0f0; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; padding: 24px 0; }
+    .app { width: 380px; border-radius: 20px; overflow: hidden; border: 0.5px solid #ddd; background: #fff; box-shadow: 0 2px 24px rgba(0,0,0,0.1); }
+    .topbar { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 0.5px solid #eee; background: #fff; }
+    .back-btn { width: 28px; height: 28px; border-radius: 50%; background: #f2f2f2; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; font-size: 15px; flex-shrink: 0; }
+    .avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 500; font-size: 13px; flex-shrink: 0; }
+    .av-sean { background: #CECBF6; color: #3C3489; }
+    .av-ila  { background: #9FE1CB; color: #085041; }
+    .contact-name { font-size: 15px; font-weight: 500; color: #111; }
+    .messages { padding: 14px 12px; display: flex; flex-direction: column; gap: 8px; min-height: 240px; background: #f7f7f7; }
+    .bubble { max-width: 72%; padding: 9px 13px; border-radius: 16px; font-size: 14px; line-height: 1.45; }
+    .bubble.me   { align-self: flex-end; background: #7F77DD; color: #fff; border-bottom-right-radius: 4px; }
+    .bubble.them { align-self: flex-start; background: #fff; color: #111; border-bottom-left-radius: 4px; border: 0.5px solid #eee; }
+    .contact-list { display: none; }
+    .contact-item { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 0.5px solid #eee; cursor: pointer; transition: background 0.15s; }
+    .contact-item:hover { background: #f7f7f7; }
+    .contact-info .cname { font-size: 15px; font-weight: 500; color: #111; }
+    .contact-info .clast { font-size: 13px; color: #888; margin-top: 2px; }
+    .click-me-wrap { display: none; padding: 20px 16px; text-align: center; }
+    .click-me { background: #7F77DD; color: #fff; border: none; border-radius: 24px; padding: 12px 32px; font-size: 15px; font-weight: 500; cursor: pointer; transition: transform 0.15s; }
+    .click-me:hover { transform: scale(1.04); }
+    .input-bar { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-top: 0.5px solid #eee; background: #fff; }
+    .input-bar input { flex: 1; border: 0.5px solid #ddd; border-radius: 20px; padding: 8px 14px; font-size: 14px; background: #f7f7f7; color: #111; outline: none; }
+    .send-btn { width: 34px; height: 34px; border-radius: 50%; background: #7F77DD; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .send-btn i { color: #fff; font-size: 16px; }
+    .typing { display: flex; align-items: center; gap: 4px; padding: 8px 13px; background: #fff; border-radius: 16px; border-bottom-left-radius: 4px; border: 0.5px solid #eee; align-self: flex-start; }
+    .typing span { width: 7px; height: 7px; border-radius: 50%; background: #7F77DD; display: inline-block; animation: blink 1.2s infinite; }
+    .typing span:nth-child(2) { animation-delay: 0.2s; }
+    .typing span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes blink { 0%,80%,100% { opacity: 0.2; } 40% { opacity: 1; } }
+    .celebration { display: none; position: fixed; inset: 0; background: #c8f0c8; z-index: 999; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
+    .celebration.show { display: flex; }
+    .petals-canvas { position: absolute; inset: 0; pointer-events: none; }
+    .bouquet { font-size: 110px; line-height: 1; margin-bottom: 12px; position: relative; z-index: 2; animation: popIn 0.6s cubic-bezier(0.175,0.885,0.32,1.275) both; }
+    .wish-text { font-size: 22px; font-weight: 600; color: #1a5c1a; text-align: center; position: relative; z-index: 2; animation: fadeUp 0.7s 0.3s both; padding: 0 24px; }
+    .wish-sub { font-size: 15px; color: #2d7a2d; margin-top: 8px; position: relative; z-index: 2; animation: fadeUp 0.7s 0.5s both; }
+    @keyframes popIn { from { transform: scale(0.3) rotate(-10deg); opacity: 0; } to { transform: scale(1) rotate(0); opacity: 1; } }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+    .list-header { padding: 14px 16px 10px; font-size: 13px; color: #888; font-weight: 500; }
+  </style>
+</head>
+<body>
+
+<div class="app" id="app">
+  <!-- Screen: Chat -->
+  <div id="screen-chat">
+    <div class="topbar">
+      <button class="back-btn" id="backBtn" aria-label="Back"><i class="ti ti-arrow-left"></i></button>
+      <div class="avatar av-sean" id="topAvatar">S</div>
+      <span class="contact-name" id="topName">Sean</span>
+    </div>
+    <div class="messages" id="msgArea"></div>
+    <div class="input-bar">
+      <input type="text" placeholder="Ketik pesan..." readonly>
+      <button class="send-btn"><i class="ti ti-send"></i></button>
+    </div>
+  </div>
+
+  <!-- Screen: Contact List -->
+  <div class="contact-list" id="screen-contacts">
+    <div class="list-header">Pesan</div>
+    <div class="contact-item" id="c-sean">
+      <div class="avatar av-sean">S</div>
+      <div class="contact-info">
+        <div class="cname">Sean</div>
+        <div class="clast">tanggal 16</div>
+      </div>
+    </div>
+    <div class="contact-item" id="c-ila">
+      <div class="avatar av-ila">K</div>
+      <div class="contact-info">
+        <div class="cname">kk ila</div>
+        <div class="clast">KAN EMANG TANGGAK SEGITU</div>
+      </div>
+    </div>
+    <div class="click-me-wrap" id="clickWrap">
+      <button class="click-me" id="clickMeBtn">✨ Click Me ✨</button>
+    </div>
+  </div>
+</div>
+
+<!-- Screen: Celebration -->
+<div class="celebration" id="celebration">
+  <canvas class="petals-canvas" id="petalsCanvas"></canvas>
+  <div class="bouquet">💐</div>
+  <div class="wish-text">Happy Mensiversary<br>Sean & Sheila! 🌹</div>
+  <div class="wish-sub">Semoga selalu bahagia ya 🥰</div>
+</div>
+
+<script>
+  const SEAN_CONVO = [
+    { from: 'me',   text: 'lo mensip tanggal berapa?' },
+    { from: 'sean', text: 'tanggal 16' },
+    { from: 'me',   text: 'LAH MENDADAK BANGET' },
+  ];
+
+  const ILA_CONVO = [
+    { from: 'me',  text: 'KOK LO GAK BILANG TANGGAL 16' },
+    { from: 'ila', text: 'KAN EMANG TANGGAK SEGITU' },
+  ];
+
+  const msgArea   = document.getElementById('msgArea');
+  const topName   = document.getElementById('topName');
+  const topAvatar = document.getElementById('topAvatar');
+  const screenChat     = document.getElementById('screen-chat');
+  const screenContacts = document.getElementById('screen-contacts');
+  const clickWrap = document.getElementById('clickWrap');
+
+  function addBubble(from, text, cb) {
+    if (from !== 'me') {
+      const typing = document.createElement('div');
+      typing.className = 'typing';
+      typing.innerHTML = '<span></span><span></span><span></span>';
+      msgArea.appendChild(typing);
+      msgArea.scrollTop = msgArea.scrollHeight;
+      setTimeout(() => {
+        typing.remove();
+        const el = document.createElement('div');
+        el.className = 'bubble them';
+        el.textContent = text;
+        msgArea.appendChild(el);
+        msgArea.scrollTop = msgArea.scrollHeight;
+        if (cb) setTimeout(cb, 700);
+      }, 900);
+    } else {
+      const el = document.createElement('div');
+      el.className = 'bubble me';
+      el.textContent = text;
+      msgArea.appendChild(el);
+      msgArea.scrollTop = msgArea.scrollHeight;
+      if (cb) setTimeout(cb, 500);
+    }
+  }
+
+  function playConvo(convo, idx, done) {
+    if (idx >= convo.length) { if (done) done(); return; }
+    addBubble(convo[idx].from, convo[idx].text, () => playConvo(convo, idx + 1, done));
+  }
+
+  function showChatSean() {
+    screenContacts.style.display = 'none';
+    screenChat.style.display = 'block';
+    topName.textContent = 'Sean';
+    topAvatar.textContent = 'S';
+    topAvatar.className = 'avatar av-sean';
+    msgArea.innerHTML = '';
+    playConvo(SEAN_CONVO, 0, switchToIla);
+  }
+
+  function switchToIla() {
+    screenChat.style.display = 'none';
+    screenContacts.style.display = 'block';
+    clickWrap.style.display = 'none';
+    setTimeout(() => {
+      screenContacts.style.display = 'none';
+      screenChat.style.display = 'block';
+      topName.textContent = 'kk ila';
+      topAvatar.textContent = 'K';
+      topAvatar.className = 'avatar av-ila';
+      msgArea.innerHTML = '';
+      playConvo(ILA_CONVO, 0, showContacts);
+    }, 1200);
+  }
+
+  function showContacts() {
+    screenChat.style.display = 'none';
+    screenContacts.style.display = 'block';
+    setTimeout(() => { clickWrap.style.display = 'block'; }, 400);
+  }
+
+  document.getElementById('backBtn').addEventListener('click', showContacts);
+
+  document.getElementById('c-sean').addEventListener('click', () => {
+    screenContacts.style.display = 'none';
+    screenChat.style.display = 'block';
+    topName.textContent = 'Sean';
+    topAvatar.textContent = 'S';
+    topAvatar.className = 'avatar av-sean';
+    msgArea.innerHTML = '';
+    playConvo(SEAN_CONVO, 0, switchToIla);
+  });
+
+  document.getElementById('c-ila').addEventListener('click', () => {
+    screenContacts.style.display = 'none';
+    screenChat.style.display = 'block';
+    topName.textContent = 'kk ila';
+    topAvatar.textContent = 'K';
+    topAvatar.className = 'avatar av-ila';
+    msgArea.innerHTML = '';
+    playConvo(ILA_CONVO, 0, showContacts);
+  });
+
+  document.getElementById('clickMeBtn').addEventListener('click', () => {
+    const cel = document.getElementById('celebration');
+    cel.classList.add('show');
+    initPetals();
+  });
+
+  function initPetals() {
+    const canvas = document.getElementById('petalsCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const colors = ['#ff5e7e','#ff8fab','#ffb3c6','#e83855','#c0392b','#ff6b6b'];
+    const petals = Array.from({ length: 38 }, () => ({
+      x:        Math.random() * canvas.width,
+      y:        -20 - Math.random() * 200,
+      r:        7 + Math.random() * 10,
+      speed:    1.2 + Math.random() * 2.2,
+      drift:    (Math.random() - 0.5) * 1.2,
+      rot:      Math.random() * Math.PI * 2,
+      rotSpeed: (Math.random() - 0.5) * 0.06,
+      opacity:  0.7 + Math.random() * 0.3,
+      color:    colors[Math.floor(Math.random() * colors.length)]
+    }));
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (const p of petals) {
+        ctx.save();
+        ctx.globalAlpha = p.opacity;
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.beginPath();
+        ctx.ellipse(0, 0, p.r, p.r * 0.55, 0, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+        ctx.restore();
+        p.y   += p.speed;
+        p.x   += p.drift;
+        p.rot += p.rotSpeed;
+        if (p.y > canvas.height + 20) { p.y = -20; p.x = Math.random() * canvas.width; }
+      }
+      requestAnimationFrame(draw);
+    }
+    draw();
+  }
+
+  // Auto-start
+  showChatSean();
+</script>
+</body>
+</html>
